@@ -129,26 +129,8 @@
             background: linear-gradient(to right, rgba(245, 158, 11, 0.15), transparent);
         }
 
-        /* Estilos específicos para la encuesta */
-        .rune-btn {
-            transition: all 0.3s ease;
-            font-family: 'Playfair Display', serif;
-        }
-        .rune-btn:hover {
-            background: rgba(245, 158, 11, 0.25);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
-            transform: scale(1.05);
-        }
-        
-        /* Estilos para notificaciones (Toast) */
-        .toast-notification {
-            position: fixed;
-            top: 24px;
-            right: -100%;
-            transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            z-index: 1000;
-        }
-        .toast-notification.show { right: 24px; }
+        .locked-state { opacity: 0.5; pointer-events: none; border-color: #334155; }
+        .unlocked-state { opacity: 1; pointer-events: auto; border-color: #38bdf8; transition: all 0.6s ease; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -246,42 +228,49 @@
         </div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-8 py-8 mb-16 relative z-10">
-        <div class="glass-panel rounded-3xl p-8 border border-amber-500/20 relative">
-            
-            <!-- Botón de Administración siempre visible -->
-            <button onclick="openAdminModal()" class="absolute top-6 right-6 text-slate-500 hover:text-amber-400 transition-colors bg-slate-900/50 p-2 rounded-full border border-white/5 hover:border-amber-500/30 shadow-lg" title="Administración">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-            </button>
+    <section class="max-w-4xl mx-auto px-8 py-8 mb-16 relative z-10 flex flex-col items-center gap-8">
+        <!-- Marcador de Puntaje integrado armónicamente para evitar colisiones en pantallas de móviles -->
+        <div id="score-banner" class="glass-panel px-8 py-3 rounded-full border border-amber-500/50 shadow-xl transition-all duration-300">
+            <span class="text-amber-400 font-bold tracking-widest text-sm">PUNTAJE: <span id="score-val" class="text-white ml-1">0</span></span>
+        </div>
 
-            <div class="text-center max-w-lg mx-auto mb-8 pt-4">
-                <h3 class="font-mystic text-2xl text-white mb-2 uppercase tracking-wider">¿Cuál es tu personaje favorito de la Senda Oculta?</h3>
-                <p class="text-xs text-amber-300 uppercase tracking-widest">Haz clic para votar por tu personaje favorito de "La Senda Oculta" y mira las estadísticas reales</p>
+        <!-- Primera parte: El Test del Saber -->
+        <div id="quiz-container" class="max-w-md w-full glass-panel p-8 rounded-3xl border border-amber-500/30 shadow-2xl">
+            <h1 class="font-mystic text-xl text-amber-500 text-center mb-6">El Test del Saber</h1>
+            <div id="quiz-box">
+                <h2 id="question" class="text-md font-semibold mb-6 text-slate-200">Cargando pregunta...</h2>
+                <div id="options" class="flex flex-col gap-3"></div>
             </div>
+            <div id="feedback" class="mt-4 text-center text-sm font-bold h-6"></div>
+        </div>
+
+        <!-- Segunda parte: El Misterio Final -->
+        <div id="final-challenge-section" class="max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500">
+            <h2 id="challenge-title" class="font-mystic text-2xl text-slate-400 text-center mb-6 flex items-center justify-center gap-2">
+                <i data-lucide="lock" id="lock-icon" class="w-5 h-5"></i> Misterio Final
+            </h2>
             
-            <!-- Botones de Votación del 1 al 4 -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
-                <button id="btn-vote-1" onclick="castVote(1)" class="rune-btn bg-slate-900/80 border border-amber-500/30 text-amber-400 p-5 rounded-xl flex flex-col items-center justify-center transition-all duration-300">
-                    <span class="text-3xl font-mystic font-bold mb-2">1</span>
-                    <span class="text-[9px] text-slate-300 uppercase tracking-widest font-semibold">Hilda</span>
-                </button>
-                <button id="btn-vote-2" onclick="castVote(2)" class="rune-btn bg-slate-900/80 border border-amber-500/30 text-sky-400 p-5 rounded-xl flex flex-col items-center justify-center transition-all duration-300">
-                    <span class="text-3xl font-mystic font-bold mb-2">2</span>
-                    <span class="text-[9px] text-slate-300 uppercase tracking-widest font-semibold">Mellizas</span>
-                </button>
-                <button id="btn-vote-3" onclick="castVote(3)" class="rune-btn bg-slate-900/80 border border-amber-500/30 text-cyan-400 p-5 rounded-xl flex flex-col items-center justify-center transition-all duration-300">
-                    <span class="text-3xl font-mystic font-bold mb-2">3</span>
-                    <span class="text-[9px] text-slate-300 uppercase tracking-widest font-semibold">Raul Asen</span>
-                </button>
-                <button id="btn-vote-4" onclick="castVote(4)" class="rune-btn bg-slate-900/80 border border-amber-500/30 text-amber-300 p-5 rounded-xl flex flex-col items-center justify-center transition-all duration-300">
-                    <span class="text-3xl font-mystic font-bold mb-2">4</span>
-                    <span class="text-[9px] text-slate-300 uppercase tracking-widest font-semibold">Gran Analista</span>
-                </button>
+            <div id="locked-content" class="text-center">
+                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 30 puntos en el Test del Saber para desbloquearlo.</p>
+                <button disabled class="w-full py-3 bg-slate-800 rounded-lg font-bold text-slate-500 cursor-not-allowed">Bloqueado</button>
             </div>
 
-            <!-- Contenedor dinámico de estadísticas y resultados -->
-            <div id="survey-content" class="bg-slate-950/80 border border-white/5 rounded-2xl p-6 transition-all duration-500">
-                <!-- Se mostrará dinámicamente mediante JS -->
+            <div id="unlocked-content" class="hidden flex flex-col gap-6">
+                <div id="final-quiz-container"></div>
+            </div>
+            <div id="final-feedback" class="mt-6 text-center text-sm font-bold h-6"></div>
+        </div>
+
+        <!-- Tercera parte: El Santuario Secreto (Visible desde el inicio) -->
+        <div id="reward-section" class="max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500">
+            <h2 class="font-mystic text-2xl text-slate-400 text-center mb-4 flex items-center justify-center gap-2">
+                <i data-lucide="gift" class="w-5 h-5"></i> Santuario Secreto
+            </h2>
+            <div id="reward-content" class="text-center">
+                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 60 puntos.</p>
+                <div class="p-4 bg-slate-900 rounded-xl border border-slate-700">
+                    <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Bloqueado</span>
+                </div>
             </div>
         </div>
     </section>
@@ -344,213 +333,203 @@
         </div>
     </footer>
 
-    <!-- Contenedor del Toast (Notificaciones) -->
-    <div id="toast-container" class="toast-notification glass-panel px-6 py-4 rounded-xl flex items-center gap-4 shadow-2xl border-l-4">
-        <i id="toast-icon" data-lucide="info" class="w-6 h-6"></i>
-        <div class="flex flex-col">
-            <span id="toast-title" class="text-sm font-bold uppercase tracking-widest text-white"></span>
-            <span id="toast-message" class="text-[10px] text-slate-300 uppercase tracking-wider"></span>
-        </div>
-    </div>
-
-    <!-- Modal de Seguridad del Administrador -->
-    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm">
-        <div class="glass-panel p-8 rounded-3xl max-w-sm w-full text-center border border-amber-500/30 shadow-2xl transform transition-all scale-100">
-            <div class="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
-                <i data-lucide="shield-alert" class="w-6 h-6 text-amber-400"></i>
-            </div>
-            <h4 class="text-white font-mystic text-xl mb-1 uppercase tracking-widest">Santuario Interno</h4>
-            <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-6">Restablecer la senda</p>
-            
-            <input type="password" id="admin-password" placeholder="Clave de acceso" class="w-full bg-slate-900/80 border border-slate-700 focus:border-amber-500/50 outline-none p-3 rounded-xl mb-6 text-white text-center tracking-[0.3em] font-bold transition-all">
-            
-            <div class="flex gap-3 justify-center">
-                <button onclick="closeAdminModal()" class="text-[10px] uppercase font-bold tracking-widest text-slate-400 hover:text-white px-4 py-2 transition-all">Cancelar</button>
-                <button onclick="verifyAndReset()" class="text-[10px] uppercase font-bold tracking-widest bg-amber-500 hover:bg-amber-400 text-slate-900 py-2 px-6 rounded-xl transition-all shadow-lg shadow-amber-500/20">Autorizar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // 1. Inicializar iconos
+        // 1. Inicializar iconos místicos
         lucide.createIcons();
 
-        // 2. Base de Datos en Cero Absoluto
-        const baseVotes = { 1: 0, 2: 0, 3: 0, 4: 0 }; 
-        let votes = JSON.parse(localStorage.getItem('leyusionis_survey_votes')) || { ...baseVotes };
-        let hasVoted = localStorage.getItem('leyusionis_user_voted') === 'true';
-        let votedOption = localStorage.getItem('leyusionis_user_voted_option');
+        let score = 0;
+        let currentQuestion = 0;
+        let currentFinalQuestion = 0;
 
-        // 3. Sistema de Notificaciones Elegantes (Toast)
-        function showToast(type, title, message) {
-            const toast = document.getElementById('toast-container');
-            const icon = document.getElementById('toast-icon');
-            
-            document.getElementById('toast-title').textContent = title;
-            document.getElementById('toast-message').textContent = message;
+        const questions = [
+            { q: "¿Qué representa el Amanecer?", o: ["Luz y oro", "Sombra", "Olvido"], a: 0 },
+            { q: "¿Qué criatura acecha?", o: ["Barcos de sombra", "Dragones", "Sirenas"], a: 0 },
+            { q: "¿Qué requiere el Atlas?", o: ["Código Cartógrafo", "Hierro", "Nada"], a: 0 }
+        ];
 
-            toast.classList.remove('border-amber-500', 'border-rose-500');
+        const finalChallenges = [
+            { q: "Color del mar profundo:", a: "cian" },
+            { q: "Qué susurra el viento:", a: "destino" },
+            { q: "Quién guarda el linaje:", a: "atlas" }
+        ];
+
+        function updateScore(pts) {
+            score += pts;
+            document.getElementById('score-val').innerText = score;
+        }
+
+        // Restablecimiento interactivo óptimo sin recarga forzosa
+        function resetQuiz() {
+            score = 0;
+            currentQuestion = 0;
+            currentFinalQuestion = 0;
+            document.getElementById('score-val').innerText = score;
+
+            document.getElementById('quiz-box').innerHTML = `
+                <h2 id="question" class="text-md font-semibold mb-6 text-slate-200">Cargando pregunta...</h2>
+                <div id="options" class="flex flex-col gap-3"></div>
+            `;
+            const feedback = document.getElementById('feedback');
+            feedback.innerText = "";
+            feedback.className = "mt-4 text-center text-sm font-bold h-6";
+
+            // Cerrar desafíos finales
+            const finalSection = document.getElementById('final-challenge-section');
+            finalSection.className = "max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500";
+            document.getElementById('locked-content').classList.remove('hidden');
+            document.getElementById('unlocked-content').classList.add('hidden');
             
-            if (type === 'success') {
-                toast.classList.add('border-amber-500');
-                icon.outerHTML = '<i id="toast-icon" data-lucide="check-circle" class="w-6 h-6 text-amber-400"></i>';
-            } else {
-                toast.classList.add('border-rose-500');
-                icon.outerHTML = '<i id="toast-icon" data-lucide="x-circle" class="w-6 h-6 text-rose-500"></i>';
-            }
+            const lockIcon = document.getElementById('lock-icon');
+            lockIcon.setAttribute('data-lucide', 'lock');
             
+            const chalTitle = document.getElementById('challenge-title');
+            chalTitle.className = "font-mystic text-2xl text-slate-400 text-center mb-6 flex items-center justify-center gap-2";
+            chalTitle.innerHTML = '<i data-lucide="lock" id="lock-icon" class="w-5 h-5"></i> Misterio Final';
+
+            document.getElementById('final-feedback').innerText = "";
+
+            // Cerrar el santuario
+            const rewardSection = document.getElementById('reward-section');
+            rewardSection.className = "max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500";
+            document.getElementById('reward-content').innerHTML = `
+                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 60 puntos.</p>
+                <div class="p-4 bg-slate-900 rounded-xl border border-slate-700">
+                    <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Bloqueado</span>
+                </div>
+            `;
+
             lucide.createIcons();
-            toast.classList.add('show');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (currentQuestion >= questions.length) return;
+            const qData = questions[currentQuestion];
+            const qEl = document.getElementById('question');
+            const oEl = document.getElementById('options');
             
-            setTimeout(() => { toast.classList.remove('show'); }, 3500);
+            qEl.innerText = qData.q;
+            oEl.innerHTML = '';
+            
+            qData.o.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-3 rounded-xl border border-amber-500/20 bg-slate-900 hover:bg-slate-800 transition-all text-left text-slate-200 hover:text-white hover:border-amber-500/50';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                oEl.appendChild(btn);
+            });
         }
 
-        // 4. Panel de Administración
-        function openAdminModal() { 
-            document.getElementById('admin-password').value = "";
-            document.getElementById('admin-modal').classList.remove('hidden'); 
-            document.getElementById('admin-modal').classList.add('flex'); 
-        }
-        
-        function closeAdminModal() { 
-            document.getElementById('admin-modal').classList.add('hidden'); 
-            document.getElementById('admin-modal').classList.remove('flex'); 
-        }
+        function checkAnswer(index) {
+            if (currentQuestion >= questions.length) return;
 
-        function verifyAndReset() {
-            const pwd = document.getElementById('admin-password').value;
-            if (pwd === "9876") {
-                // Borrado total y restauración a cero
-                localStorage.setItem('leyusionis_survey_votes', JSON.stringify(baseVotes));
-                localStorage.removeItem('leyusionis_user_voted');
-                localStorage.removeItem('leyusionis_user_voted_option');
-                
-                votes = { ...baseVotes };
-                hasVoted = false;
-                votedOption = null;
-                
-                closeAdminModal();
-                showToast('success', 'Portal Restaurado', 'Todas las estadísticas han vuelto a cero');
-                renderSurvey();
+            const isCorrect = (index === questions[currentQuestion].a);
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                updateScore(10);
+                feedback.innerText = "¡Sabio!";
+                feedback.className = "mt-4 text-center text-sm font-bold text-amber-400 animate-pulse";
             } else {
-                showToast('error', 'Acceso Denegado', 'La clave ingresada es incorrecta');
-                document.getElementById('admin-password').value = "";
+                feedback.innerText = "Error, pero la senda continúa.";
+                feedback.className = "mt-4 text-center text-sm font-bold text-slate-400";
             }
-        }
 
-        // 5. Renderizado de la encuesta
-        function renderSurvey() {
-            const container = document.getElementById('survey-content');
-            
-            if (!hasVoted) {
-                container.innerHTML = `
-                    <div class="text-center py-4">
-                        <p class="text-slate-300 italic text-sm">"Toca una de las cuatro opciones de arriba para registrar tu voto en el gran mural estelar..."</p>
-                    </div>
-                `;
-                
-                for (let i = 1; i <= 4; i++) {
-                    const btn = document.getElementById(`btn-vote-${i}`);
-                    if (btn) btn.classList.remove('opacity-40', 'ring-2', 'ring-amber-500', 'bg-amber-500/10');
-                }
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                setTimeout(renderQuestion, 600);
             } else {
-                const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
-                const labels = {
-                    1: { name: "La Senda", color: "bg-amber-500", text: "text-amber-400" },
-                    2: { name: "La Magia", color: "bg-sky-500", text: "text-sky-400" },
-                    3: { name: "El Destino", color: "bg-cyan-500", text: "text-cyan-400" },
-                    4: { name: "Superación", color: "bg-yellow-400", text: "text-amber-300" }
-                };
-
-                let statsHtml = `
-                    <div class="space-y-5">
-                        <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
-                            <span class="text-xs text-amber-300 uppercase tracking-widest font-bold flex items-center gap-2">
-                                <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Resultados 
-                            </span>
-                            <span class="text-[10px] text-slate-400 uppercase tracking-wider bg-white/5 px-2.5 py-1 rounded-md">Votos Totales: ${totalVotes}</span>
-                        </div>
-                `;
-
-                for (let i = 1; i <= 4; i++) {
-                    const count = votes[i];
-                    const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-                    const isUserChoice = votedOption == i;
-                    
-                    const btn = document.getElementById(`btn-vote-${i}`);
-                    if (btn) {
-                        if (isUserChoice) {
-                            btn.classList.add('ring-2', 'ring-amber-500', 'bg-amber-500/10');
-                            btn.classList.remove('opacity-40');
-                        } else {
-                            btn.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-500/10');
-                            btn.classList.add('opacity-40');
-                        }
-                    }
-
-                    statsHtml += `
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between items-center text-xs font-semibold">
-                                <span class="${labels[i].text} flex items-center gap-1.5">
-                                    ${i}. ${labels[i].name} 
-                                    ${isUserChoice ? '<span class="text-[8px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded uppercase font-black">Tu Voto</span>' : ''}
-                                </span>
-                                <span class="text-slate-300">${percentage}% (${count} ${count === 1 ? 'voto' : 'votos'})</span>
-                            </div>
-                            <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden">
-                                <div class="${labels[i].color} h-full transition-all duration-1000 ease-out" style="width: ${percentage}%"></div>
-                            </div>
-                        </div>
+                if (score === 30) {
+                    document.getElementById('quiz-box').innerHTML = '<p class="text-center text-amber-400 font-bold py-4">¡Test completado! Desbloqueando misterio...</p>';
+                    unlockFinalChallenge();
+                } else {
+                    document.getElementById('quiz-box').innerHTML = `
+                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto.</p>
+                        <button onclick="resetQuiz()" class="w-full py-3 bg-amber-500 text-black rounded-lg font-bold hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Reiniciar Test</button>
                     `;
                 }
-
-                statsHtml += `
-                        <div class="pt-4 flex justify-center">
-                            <button onclick="resetMyVote()" class="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-white flex items-center gap-2 border border-white/10 hover:border-white/20 bg-slate-900 px-4 py-2 rounded-lg transition-all hover:scale-105 shadow-md">
-                                <i data-lucide="rotate-ccw" class="w-3 h-3 text-amber-400"></i> Cambiar mi elección
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                container.innerHTML = statsHtml;
-                lucide.createIcons();
             }
         }
 
-        // 6. Funciones de Voto del Usuario
-        function castVote(option) {
-            if (hasVoted) return; 
+        function unlockFinalChallenge() {
+            const section = document.getElementById('final-challenge-section');
+            section.classList.remove('locked-state');
+            section.classList.add('unlocked-state');
             
-            votes[option]++;
-            hasVoted = true;
-            votedOption = option;
-
-            localStorage.setItem('leyusionis_survey_votes', JSON.stringify(votes));
-            localStorage.setItem('leyusionis_user_voted', 'true');
-            localStorage.setItem('leyusionis_user_voted_option', option);
-
-            renderSurvey();
+            document.getElementById('locked-content').classList.add('hidden');
+            document.getElementById('unlocked-content').classList.remove('hidden');
+            
+            const chalTitle = document.getElementById('challenge-title');
+            chalTitle.classList.remove('text-slate-400');
+            chalTitle.classList.add('text-sky-400');
+            chalTitle.innerHTML = '<i data-lucide="unlock" id="lock-icon" class="w-5 h-5 text-sky-400"></i> Misterio Final';
+            
+            lucide.createIcons();
+            renderFinalChallenge();
         }
 
-        function resetMyVote() {
-            if (!hasVoted) return;
-            if (votes[votedOption] > 0) votes[votedOption]--;
-            
-            hasVoted = false;
-            votedOption = null;
+        function renderFinalChallenge() {
+            const container = document.getElementById('final-quiz-container');
+            if (currentFinalQuestion >= finalChallenges.length) {
+                revealHiddenLink();
+                return;
+            }
 
-            localStorage.setItem('leyusionis_survey_votes', JSON.stringify(votes));
-            localStorage.setItem('leyusionis_user_voted', 'false');
-            localStorage.removeItem('leyusionis_user_voted_option');
-
-            renderSurvey();
+            const item = finalChallenges[currentFinalQuestion];
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <label class="block text-sm text-slate-300">${item.q}</label>
+                    <input type="text" id="final-in" class="w-full bg-slate-950/80 border border-slate-700 focus:border-sky-500 outline-none p-3 rounded-lg text-white transition-all text-center tracking-wider" placeholder="Tu respuesta...">
+                    <button onclick="checkFinalChallenge()" class="w-full py-3 bg-sky-600 rounded-lg font-bold text-white hover:bg-sky-500 transition-all text-xs uppercase tracking-widest">Responder</button>
+                </div>
+            `;
         }
 
-        // 7. Arrancar al cargar
-        window.addEventListener('DOMContentLoaded', () => {
-            renderSurvey();
-        });
+        function checkFinalChallenge() {
+            const input = document.getElementById('final-in');
+            const val = input.value.toLowerCase().trim();
+            const correct = finalChallenges[currentFinalQuestion].a;
+            const feedback = document.getElementById('final-feedback');
+
+            if (val === correct) {
+                updateScore(10);
+                feedback.innerText = "¡Verdad revelada!";
+                feedback.className = "mt-6 text-center text-sm font-bold text-green-400";
+                currentFinalQuestion++;
+                
+                if (currentFinalQuestion < finalChallenges.length) {
+                    setTimeout(() => {
+                        feedback.innerText = "";
+                        renderFinalChallenge();
+                    }, 1000);
+                } else {
+                    renderFinalChallenge();
+                }
+            } else {
+                feedback.innerText = "Esa no es la respuesta correcta.";
+                feedback.className = "mt-6 text-center text-sm font-bold text-red-400";
+            }
+        }
+
+        function revealHiddenLink() {
+            const rewardSection = document.getElementById('reward-section');
+            rewardSection.classList.remove('locked-state');
+            rewardSection.classList.add('unlocked-state');
+            
+            const container = document.getElementById('reward-content');
+            container.innerHTML = `
+                <div class="text-center space-y-6 animate-pulse py-4">
+                    <p class="text-green-400 font-bold text-xl uppercase tracking-widest">¡Santuario Desbloqueado!</p>
+                    <a href="https://nibrimabrite-art.github.io/estelarium/" target="_blank"
+                       class="block w-full py-4 bg-gradient-to-r from-amber-500 to-sky-600 rounded-xl font-bold text-white shadow-2xl hover:scale-105 transition-all uppercase tracking-widest text-xs">
+                       Entrar al Santuario Secreto
+                    </a>
+                </div>
+            `;
+        }
+
+        // Iniciar las trivias
+        renderQuestion();
     </script>
 </body>
 </html>

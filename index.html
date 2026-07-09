@@ -179,7 +179,7 @@
                 </span>
             </h1>
             <p class="text-slate-200 text-lg mb-10 leading-relaxed max-w-xl italic font-light">
-                "Una chica que intenta descubrir su origen se enfrenta a un mundo desconocido, mientras debe afrontar sus nuevas circunstancias, conocer a su tripulación and descubrir sus extraños poderes."
+                "Una chica que intenta descubrir su origen se enfrenta a un mundo desconocido, mientras debe afrontar sus nuevas circunstancias, conocer a su tripulación y descubrir sus extraños poderes."
             </p>
             
             <div class="flex flex-wrap gap-4 mb-10">
@@ -251,7 +251,7 @@
             </h2>
             
             <div id="locked-content" class="text-center">
-                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 30 puntos en el Test del Saber para desbloquearlo.</p>
+                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 40 puntos en el Test del Saber para desbloquearlo.</p>
                 <button disabled class="w-full py-3 bg-slate-800 rounded-lg font-bold text-slate-500 cursor-not-allowed">Bloqueado</button>
             </div>
 
@@ -267,7 +267,7 @@
                 <i data-lucide="gift" class="w-5 h-5"></i> Santuario Secreto
             </h2>
             <div id="reward-content" class="text-center">
-                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 60 puntos.</p>
+                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 80 puntos.</p>
                 <div class="p-4 bg-slate-900 rounded-xl border border-slate-700">
                     <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Bloqueado</span>
                 </div>
@@ -341,26 +341,29 @@
         let currentQuestion = 0;
         let currentFinalQuestion = 0;
 
-        // Pools de preguntas (4 preguntas disponibles en cada una, ahora con 4 alternativas cada una)
+        // Repertorio de preguntas (Cada una con 4 alternativas)
         const questionsPool = [
-            { q: "¿Cual es la virtud de las virtudes en la senda oculta?", o: ["Halgilo", "Justicia", "Verdad", "Templanza"], a: 0 },
+            { q: "¿Qué representa el Amanecer?", o: ["Luz y oro", "Sombra", "Olvido", "El abismo helado"], a: 0 },
             { q: "¿Qué criatura acecha?", o: ["Barcos de sombra", "Dragones de viento", "Sirenas de coral", "Fantasmas del puerto"], a: 0 },
             { q: "¿Qué requiere el Atlas?", o: ["Código Cartógrafo", "Hierro antiguo", "La brújula rota", "La runa solar"], a: 0 },
-            { q: "¿Qué busca el barco que zarpa?", o: ["Tesoros ocultos", "Un puerto seguro", "La gran tormenta", "La isla del olvido"], a: 0 }
+            { q: "¿Qué busca el barco que zarpa?", o: ["Tesoros ocultos", "Un puerto seguro", "La gran tormenta", "La isla del olvido"], a: 0 },
+            { q: "¿Qué secreto guarda el mar?", o: ["Un linaje místico", "Arena de plata", "Ruinas de cristal", "Un templo olvidado"], a: 0 }
         ];
 
+        // Desafíos de texto escrito
         const finalChallengesPool = [
             { q: "Color del mar profundo:", a: "cian" },
             { q: "Qué susurra el viento:", a: "destino" },
             { q: "Quién guarda el linaje:", a: "atlas" },
-            { q: "Qué intenta descubrir la protagonista:", a: "origen" }
+            { q: "Qué intenta descubrir la protagonista:", a: "origen" },
+            { q: "Poder elemental del linaje:", a: "mar" }
         ];
 
-        // Listas activas que contendrán las 3 preguntas aleatorias seleccionadas para la sesión actual
+        // Listas dinámicas de la sesión actual (Se escogen 4 de cada pool)
         let activeQuestions = [];
         let activeFinalChallenges = [];
 
-        // Función de mezcla Fisher-Yates para asegurar aleatoriedad real
+        // Función Fisher-Yates para barajar arreglos de forma aleatoria
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
             while (currentIndex != 0) {
@@ -371,10 +374,10 @@
             return array;
         }
 
-        // Selección de exactamente 3 preguntas aleatorias al azar de cada pool
+        // Selección de exactamente 4 preguntas aleatorias para el juego
         function selectRandomQuestions() {
-            activeQuestions = shuffle([...questionsPool]).slice(0, 3);
-            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 3);
+            activeQuestions = shuffle([...questionsPool]).slice(0, 4);
+            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 4);
         }
 
         function updateScore(pts) {
@@ -382,14 +385,14 @@
             document.getElementById('score-val').innerText = score;
         }
 
-        // Restablecimiento interactivo óptimo sin recarga forzosa
+        // Reseteo interactivo sin recarga forzada de página
         function resetQuiz() {
             score = 0;
             currentQuestion = 0;
             currentFinalQuestion = 0;
             document.getElementById('score-val').innerText = score;
 
-            // Volver a sortear preguntas de los pools
+            // Sortear de nuevo 4 preguntas aleatorias
             selectRandomQuestions();
 
             document.getElementById('quiz-box').innerHTML = `
@@ -400,7 +403,7 @@
             feedback.innerText = "";
             feedback.className = "mt-4 text-center text-sm font-bold h-6";
 
-            // Cerrar desafíos finales
+            // Cerrar y bloquear la segunda sección (Misterio Final)
             const finalSection = document.getElementById('final-challenge-section');
             finalSection.className = "max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500";
             document.getElementById('locked-content').classList.remove('hidden');
@@ -415,11 +418,11 @@
 
             document.getElementById('final-feedback').innerText = "";
 
-            // Cerrar el santuario
+            // Cerrar el santuario secreto
             const rewardSection = document.getElementById('reward-section');
             rewardSection.className = "max-w-md w-full glass-panel p-8 rounded-3xl border border-slate-700 shadow-2xl locked-state transition-all duration-500";
             document.getElementById('reward-content').innerHTML = `
-                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 60 puntos.</p>
+                <p class="text-xs text-amber-500/60 mb-4 italic">🗝️ El acceso al santuario requiere un conocimiento de 80 puntos.</p>
                 <div class="p-4 bg-slate-900 rounded-xl border border-slate-700">
                     <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Bloqueado</span>
                 </div>
@@ -438,20 +441,19 @@
             qEl.innerText = qData.q;
             oEl.innerHTML = '';
             
-            // Creamos un array temporal con las alternativas y registramos si es la correcta original (index 0)
+            // Mapear alternativas originales registrando cuál es la correcta
             const mappedOptions = qData.o.map((opt, index) => ({
                 text: opt,
                 isCorrect: index === qData.a
             }));
 
-            // Mezclamos las alternativas para que salgan en orden aleatorio
+            // Mezclar aleatoriamente el orden de las alternativas
             shuffle(mappedOptions);
 
             mappedOptions.forEach((opt) => {
                 const btn = document.createElement('button');
                 btn.className = 'w-full p-3 rounded-xl border border-amber-500/20 bg-slate-900 hover:bg-slate-800 transition-all text-left text-slate-200 hover:text-white hover:border-amber-500/50';
                 btn.innerText = opt.text;
-                // Enviamos directamente el booleano que indica si la alternativa es la correcta
                 btn.onclick = () => checkAnswer(opt.isCorrect);
                 oEl.appendChild(btn);
             });
@@ -475,12 +477,13 @@
             if (currentQuestion < activeQuestions.length) {
                 setTimeout(renderQuestion, 600);
             } else {
-                if (score === 30) {
+                // Ahora requiere los 4 aciertos (40 puntos) para avanzar
+                if (score === 40) {
                     document.getElementById('quiz-box').innerHTML = '<p class="text-center text-amber-400 font-bold py-4">¡Test completado! Desbloqueando misterio...</p>';
                     unlockFinalChallenge();
                 } else {
                     document.getElementById('quiz-box').innerHTML = `
-                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto.</p>
+                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto (Necesitas 40 puntos).</p>
                         <button onclick="resetQuiz()" class="w-full py-3 bg-amber-500 text-black rounded-lg font-bold hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Reiniciar Test</button>
                     `;
                 }
@@ -507,7 +510,15 @@
         function renderFinalChallenge() {
             const container = document.getElementById('final-quiz-container');
             if (currentFinalQuestion >= activeFinalChallenges.length) {
-                revealHiddenLink();
+                // Si completó con éxito las 4 preguntas de la segunda sección y tiene 80 puntos totales
+                if (score === 80) {
+                    revealHiddenLink();
+                } else {
+                    document.getElementById('unlocked-content').innerHTML = `
+                        <p class="text-center text-red-400 font-bold mb-4">No has acumulado el conocimiento suficiente (Requiere 80 puntos totales).</p>
+                        <button onclick="resetQuiz()" class="w-full py-3 bg-amber-500 text-black rounded-lg font-bold hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Reintentar</button>
+                    `;
+                }
                 return;
             }
 
@@ -564,7 +575,7 @@
             `;
         }
 
-        // Iniciar las trivias con las preguntas aleatorias seleccionadas de los pools
+        // Inicializar el sorteo al cargar
         selectRandomQuestions();
         renderQuestion();
     </script>

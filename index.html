@@ -251,7 +251,7 @@
             </h2>
             
             <div id="locked-content" class="text-center">
-                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 40 puntos en el Test del Saber para desbloquearlo.</p>
+                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 60 puntos en el Test del Saber para desbloquearlo.</p>
                 <button disabled class="w-full py-3 bg-slate-800 rounded-lg font-bold text-slate-500 cursor-not-allowed">Bloqueado</button>
             </div>
 
@@ -383,8 +383,8 @@
 
         // Selección de exactamente 4 preguntas aleatorias para el juego
         function selectRandomQuestions() {
-            activeQuestions = shuffle([...questionsPool]).slice(0, 4);
-            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 4);
+            activeQuestions = shuffle([...questionsPool]).slice(0, 6);
+            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 6);
         }
 
         function updateScore(pts) {
@@ -484,13 +484,13 @@
             if (currentQuestion < activeQuestions.length) {
                 setTimeout(renderQuestion, 600);
             } else {
-                // Ahora requiere los 4 aciertos (40 puntos) para avanzar
-                if (score === 40) {
+                // Ahora requiere los 6 aciertos (60 puntos) para avanzar
+                if (score === 60) {
                     document.getElementById('quiz-box').innerHTML = '<p class="text-center text-amber-400 font-bold py-4">¡Test completado! Desbloqueando misterio...</p>';
                     unlockFinalChallenge();
                 } else {
                     document.getElementById('quiz-box').innerHTML = `
-                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto (Necesitas 40 puntos).</p>
+                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto (Necesitas 60 puntos).</p>
                         <button onclick="resetQuiz()" class="w-full py-3 bg-amber-500 text-black rounded-lg font-bold hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Reiniciar Test</button>
                     `;
                 }

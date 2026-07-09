@@ -251,7 +251,7 @@
             </h2>
             
             <div id="locked-content" class="text-center">
-                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 60 puntos en el Test del Saber para desbloquearlo.</p>
+                <p class="text-xs text-amber-500/60 mb-6 italic">🔒 El misterio permanece oculto. Necesitas 40 puntos en el Test del Saber para desbloquearlo.</p>
                 <button disabled class="w-full py-3 bg-slate-800 rounded-lg font-bold text-slate-500 cursor-not-allowed">Bloqueado</button>
             </div>
 
@@ -349,6 +349,7 @@
             { q: "¿Quien es el autor de la Senda Oculta el despertar de Hilda?", o: ["Luis Aguilera Albiña", "Martin Luther King", "Pitagoras", "Paulo Coelo"], a: 0 },
             { q: "¿Quien es la protagonista de la Senda Oculta?", o: ["Hilda", "Papelucho", "El Gran Analista", "Margarita"], a: 0 },
             { q: "¿A que ciudad se dirigen los protagonistas al Final de la Travesia?", o: ["Salamancia", "New York", "Illapel", "Valdivia"], a: 0 },
+            { q: "¿Qué criatura acecha?", o: ["Barcos de sombra", "Dragones de viento", "Sirenas de coral", "Fantasmas del puerto"], a: 0 },
             { q: "¿Qué requiere el Atlas?", o: ["Código Cartógrafo", "Hierro antiguo", "La brújula rota", "La runa solar"], a: 0 },
             { q: "¿Qué busca el barco que zarpa?", o: ["Tesoros ocultos", "Un puerto seguro", "La gran tormenta", "La isla del olvido"], a: 0 },
             { q: "¿Qué secreto guarda el mar?", o: ["Un linaje místico", "Arena de plata", "Ruinas de cristal", "Un templo olvidado"], a: 0 }
@@ -356,12 +357,12 @@
 
         // Desafíos de texto escrito
         const finalChallengesPool = [
-            { q: "Ultima virtud de la senda:", a: "gratitud" },
-            { q: "habilidad de Raul Asen:", a: "viento" },
-            { q: "Que le regalo la abuela a Hilda:", a: "libreta" },
             { q: "Color del mar profundo:", a: "cian" },
             { q: "Qué susurra el viento:", a: "destino" },
             { q: "Quién guarda el linaje:", a: "atlas" },
+            { q: "Ultima virtud de la senda:", a: "gratitud" },
+            { q: "habilidad de Raul Asen:", a: "viento" },
+            { q: "Que le regalo la abuela a Hilda:", a: "libreta" },
             { q: "Qué intenta descubrir la protagonista:", a: "origen" },
             { q: "Poder elemental del linaje:", a: "mar" }
         ];
@@ -383,8 +384,8 @@
 
         // Selección de exactamente 4 preguntas aleatorias para el juego
         function selectRandomQuestions() {
-            activeQuestions = shuffle([...questionsPool]).slice(0, 8);
-            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 8);
+            activeQuestions = shuffle([...questionsPool]).slice(0, 4);
+            activeFinalChallenges = shuffle([...finalChallengesPool]).slice(0, 4);
         }
 
         function updateScore(pts) {
@@ -484,13 +485,13 @@
             if (currentQuestion < activeQuestions.length) {
                 setTimeout(renderQuestion, 600);
             } else {
-                // Ahora requiere los 6 aciertos (60 puntos) para avanzar
-                if (score === 60) {
+                // Ahora requiere los 4 aciertos (40 puntos) para avanzar
+                if (score === 40) {
                     document.getElementById('quiz-box').innerHTML = '<p class="text-center text-amber-400 font-bold py-4">¡Test completado! Desbloqueando misterio...</p>';
                     unlockFinalChallenge();
                 } else {
                     document.getElementById('quiz-box').innerHTML = `
-                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto (Necesitas 60 puntos).</p>
+                        <p class="text-center text-red-400 font-bold mb-4">No has reunido el saber suficiente. El misterio sigue oculto (Necesitas 40 puntos).</p>
                         <button onclick="resetQuiz()" class="w-full py-3 bg-amber-500 text-black rounded-lg font-bold hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Reiniciar Test</button>
                     `;
                 }

@@ -179,7 +179,7 @@
                 </span>
             </h1>
             <p class="text-slate-200 text-lg mb-10 leading-relaxed max-w-xl italic font-light">
-                "Una chica que intenta descubrir su origen se enfrenta a un mundo desconocido, mientras debe afrontar sus nuevas circunstancias, conocer a su tripulación y descubrir sus extraños poderes."
+                "Una chica que intenta descubrir su origen se enfrenta a un mundo desconocido, mientras debe afrontar sus nuevas circunstancias, conocer a su tripulación and descubrir sus extraños poderes."
             </p>
             
             <div class="flex flex-wrap gap-4 mb-10">
@@ -341,12 +341,12 @@
         let currentQuestion = 0;
         let currentFinalQuestion = 0;
 
-        // Pools de preguntas (4 preguntas disponibles en cada una)
+        // Pools de preguntas (4 preguntas disponibles en cada una, ahora con 4 alternativas cada una)
         const questionsPool = [
-            { q: "¿Qué representa el Amanecer?", o: ["Luz y oro", "Sombra", "Olvido"], a: 0 },
-            { q: "¿Qué criatura acecha?", o: ["Barcos de sombra", "Dragones", "Sirenas"], a: 0 },
-            { q: "¿Qué requiere el Atlas?", o: ["Código Cartógrafo", "Hierro", "Nada"], a: 0 },
-            { q: "¿Qué busca el barco que zarpa?", o: ["Tesoros ocultos", "Un puerto seguro", "La tempestad"], a: 0 }
+            { q: "¿Qué representa el Amanecer?", o: ["Luz y oro", "Sombra", "Olvido", "El abismo helado"], a: 0 },
+            { q: "¿Qué criatura acecha?", o: ["Barcos de sombra", "Dragones de viento", "Sirenas de coral", "Fantasmas del puerto"], a: 0 },
+            { q: "¿Qué requiere el Atlas?", o: ["Código Cartógrafo", "Hierro antiguo", "La brújula rota", "La runa solar"], a: 0 },
+            { q: "¿Qué busca el barco que zarpa?", o: ["Tesoros ocultos", "Un puerto seguro", "La gran tormenta", "La isla del olvido"], a: 0 }
         ];
 
         const finalChallengesPool = [
@@ -438,19 +438,28 @@
             qEl.innerText = qData.q;
             oEl.innerHTML = '';
             
-            qData.o.forEach((opt, index) => {
+            // Creamos un array temporal con las alternativas y registramos si es la correcta original (index 0)
+            const mappedOptions = qData.o.map((opt, index) => ({
+                text: opt,
+                isCorrect: index === qData.a
+            }));
+
+            // Mezclamos las alternativas para que salgan en orden aleatorio
+            shuffle(mappedOptions);
+
+            mappedOptions.forEach((opt) => {
                 const btn = document.createElement('button');
                 btn.className = 'w-full p-3 rounded-xl border border-amber-500/20 bg-slate-900 hover:bg-slate-800 transition-all text-left text-slate-200 hover:text-white hover:border-amber-500/50';
-                btn.innerText = opt;
-                btn.onclick = () => checkAnswer(index);
+                btn.innerText = opt.text;
+                // Enviamos directamente el booleano que indica si la alternativa es la correcta
+                btn.onclick = () => checkAnswer(opt.isCorrect);
                 oEl.appendChild(btn);
             });
         }
 
-        function checkAnswer(index) {
+        function checkAnswer(isCorrect) {
             if (currentQuestion >= activeQuestions.length) return;
 
-            const isCorrect = (index === activeQuestions[currentQuestion].a);
             const feedback = document.getElementById('feedback');
             
             if (isCorrect) {
